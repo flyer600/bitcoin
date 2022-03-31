@@ -38,6 +38,20 @@
 
 #include <math.h>
 
+#include <sstream>
+
+#include "chain.h"
+
+extern CBlockIndex *pindexBestHeader;
+
+std::string GetThreadId() 
+{
+    std::thread::id id = std::this_thread::get_id();
+    std::stringstream sin;
+    sin << id;
+    return sin.str();
+}
+
 // Dump addresses to peers.dat and banlist.dat every 15 minutes (900s)
 #define DUMP_ADDRESSES_INTERVAL 900
 
@@ -2829,6 +2843,10 @@ void CConnman::PushMessage(CNode* pnode, CSerializedNetMsg&& msg)
     uint256 hash = Hash(msg.data.data(), msg.data.data() + nMessageSize);
     CMessageHeader hdr(Params().MessageStart(), msg.command.c_str(), nMessageSize);
     memcpy(hdr.pchChecksum, hash.begin(), CMessageHeader::CHECKSUM_SIZE);
+
+    LogPrintf("heighe:%d threadid:%s ProcessMessage Command:%s remote address:%s NodeId:%d\n", 
+        (pindexBestHeader == nullptr) ? 0 : pindexBestHeader->nHeight,
+        GetThreadId().c_str(), msg.command.c_str(), pnode->addr.ToStringIPPort().c_str(), pnode->GetId());
 
     CVectorWriter{SER_NETWORK, INIT_PROTO_VERSION, serializedHeader, 0, hdr};
 

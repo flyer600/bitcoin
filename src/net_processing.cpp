@@ -1457,8 +1457,14 @@ bool static ProcessHeadersMessage(CNode *pfrom, CConnman *connman, const std::ve
     return true;
 }
 
+std::string GetThreadId();
+
 bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams, CConnman* connman, const std::atomic<bool>& interruptMsgProc)
 {
+    LogPrintf("heighe:%d threadid:%s ProcessMessage Command:%s remote address:%s NodeId:%d\n", 
+        (pindexBestHeader == nullptr) ? 0 : pindexBestHeader->nHeight,
+        GetThreadId().c_str(), strCommand.c_str(), pfrom->addr.ToStringIPPort().c_str(), pfrom->GetId());
+
     LogPrint(BCLog::NET, "received: %s (%u bytes) peer=%d\n", SanitizeString(strCommand), vRecv.size(), pfrom->GetId());
     if (gArgs.IsArgSet("-dropmessagestest") && GetRand(gArgs.GetArg("-dropmessagestest", 0)) == 0)
     {
